@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Email Sender</title>
+
+    <style>
+        label { display: block }
+        textarea, input { width: 400px; }
+        div { padding: 5px 0 }
+    </style>
+</head>
+<body>
+    <h1>Spamer</h1>
+    <hr />
+
+    <form action="http://localhost:8080" method="POST">
+        <div>
+            <label>Assunto</label>
+            <input name="subject" id="subject" placeholder="Assunto"></input>
+        </div>
+
+        <div>
+            <label>Mensagem</label>
+            <textarea name="message" id="message" cols="30" rows="10" placeholder="Mensagem"></textarea>
+        </div>
+        <div>
+            <button type='input'>Enviar</button>
+        </div>
+    </form>
+</body>
+</html>
