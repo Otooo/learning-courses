@@ -1,24 +1,69 @@
 version: '3'
 volumes:
   dados:
+networks:
+  # Redes criadas
+  banco:
+  web:
+  fila:
 services:
   db_server:
     image: postgres:9.6
     volumes:
+      # Volume dos dados
       - dados:/var/lib/postgresql/data
+      # Volume dos scripts
       - ./scripts:/scripts
+      # Script de inicialização do banco
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - banco
   frontend:
     image: nginx:1.13
     volumes:
-      - ./web:/usr/share/nginx/html/
+      # Site
+      - ./web:/usr/share/nginx/html
+      # Confguração do NGINX
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     ports:
       - 80:80
+    networks:
+      # Rede conectada
+      - web
+    depends_on:
+      # Serviço dependente
+      - backend
   backend:
     image: python:3.6
     volumes: 
+      # Pasta da aplicação
       - ./app:/app
     working_dir: /app
     command: bash ./app.sh
-    ports:
-      - 8080:8080
+    networks:
+      # Redes conectadas
+      - web
+      - banco
+      - fila
+    depends_on:
+      # Serviço dependente
+      - db_server
+    env_file: ./app/.env
+  queue:
+    image: redis:3.2
+    networks:
+      - fila
+    environment:
+      - REDIS_HOST=queue
+      - REDIS_PORT=6379
+  worker:
+    build: ./worker
+    volumes:
+      # Worker
+      - ./worker:/worker
+    working_dir: /worker
+    command: bash ./worker.sh
+    networks:
+      - fila
+    depends_on:
+      - backend
